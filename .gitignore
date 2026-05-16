@@ -1,0 +1,71 @@
+# =========================
+# Dependencies
+# =========================
+node_modules
+**/node_modules
+
+# =========================
+# Build outputs
+# =========================
+dist
+build
+out
+coverage
+
+client/dist
+server/dist
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+client/.env
+server/.env
+
+# =========================
+# Logs
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Runtime
+# =========================
+.pnpm-store
+.vite
+.cache
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode
+.idea
+
+# =========================
+# Testing
+# =========================
+coverage
+
+# =========================
+# Prisma (nếu có backend DB)
+# =========================
+prisma/dev.db
+
+# =========================
+# Misc
+# =========================
+tmp
+temp
