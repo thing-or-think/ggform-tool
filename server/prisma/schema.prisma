@@ -7,8 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model HealthCheck {
-  id        String   @id @default(uuid())
-  status    String
+enum FormProvider {
+  GOOGLE_FORM
+}
+
+enum SubmissionJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  PARTIAL_FAILED
+  FAILED
+  CANCELLED
+}
+
+model Form {
+  id        String       @id @default(uuid())
+  formUrl   String
+  title     String?
+  provider  FormProvider @default(GOOGLE_FORM)
+  fields    Json
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  jobs SubmissionJob[]
+
+  @@unique([formUrl])
+  @@index([provider])
+  @@index([createdAt])
+  @@map("forms")
+}
+
+model SubmissionJob {
+  id     String              @id @default(uuid())
+  formId String
+  status SubmissionJobStatus @default(QUEUED)
+
+  queuedAt   DateTime  @default(now())
+  startedAt  DateTime?
+  finishedAt DateTime?
+
+  failedCount  Int @default(0)
+  successCount Int @default(0)
+  totalRecords Int @default(0)
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  form    Form               @relation(fields: [formId], references: [id], onDelete: Cascade)
+  results SubmissionResult[]
+
+  @@index([formId])
+  @@index([status])
+  @@index([queuedAt])
+  @@index([finishedAt])
+  @@index([status, queuedAt])
+  @@map("submission_jobs")
+}
+
+model SubmissionResult {
+  id    String @id @default(uuid())
+  jobId String
+
+  success      Boolean
+  attemptCount Int      @default(1)
+  submittedAt  DateTime @default(now())
+  durationMs   Int?
+
+  requestPayload  Json?
+  responsePayload Json?
+  errorMessage    String?
+
+  createdAt DateTime @default(now())
+
+  job SubmissionJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([success])
+  @@index([submittedAt])
+  @@index([jobId, success])
+  @@map("submission_results")
 }
