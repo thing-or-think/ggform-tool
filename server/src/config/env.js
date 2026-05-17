@@ -1,3 +1,21 @@
+/**
+ * Environment Configuration
+ *
+ * Responsibility:
+ * - Loads and validates required environment variables at application startup.
+ * - Provides a typed, centralized configuration object for app, database, Redis, and queue settings.
+ *
+ * Used by:
+ * - Application bootstrap
+ * - Database configuration
+ * - Queue infrastructure
+ * - Worker runtime
+ *
+ * Notes:
+ * - The process exits early when required environment variables are invalid.
+ * - All modules should read configuration from this file instead of accessing process.env directly.
+ */
+
 import 'dotenv/config'
 import { z } from 'zod'
 
@@ -24,9 +42,26 @@ const envSchema = z.object({
     .number()
     .default(6379),
 
+  REDIS_PASSWORD: z
+    .string()
+    .optional(),
+
   CLIENT_URL: z
     .string()
-    .default('http://localhost:5173')
+    .default('http://localhost:5173'),
+
+  QUEUE_SUBMIT_NAME: z
+    .string()
+    .default('form-submit-queue'),
+
+  QUEUE_SUBMIT_DLQ_NAME: z
+    .string()
+    .default('form-submit-dlq'),
+
+  WORKER_CONCURRENCY: z
+    .coerce
+    .number()
+    .default(5)
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
@@ -37,4 +72,24 @@ if (!parsedEnv.success) {
   process.exit(1)
 }
 
-export const env = parsedEnv.data
+const config = parsedEnv.data
+
+export const env = {
+  nodeEnv: config.NODE_ENV,
+  port: config.PORT,
+  databaseUrl: config.DATABASE_URL,
+
+  redis: {
+    host: config.REDIS_HOST,
+    port: config.REDIS_PORT,
+    password: config.REDIS_PASSWORD ?? undefined
+  },
+
+  queue: {
+    submitQueueName: config.QUEUE_SUBMIT_NAME,
+    submitDlqName: config.QUEUE_SUBMIT_DLQ_NAME,
+    workerConcurrency: config.WORKER_CONCURRENCY
+  },
+
+  clientUrl: config.CLIENT_URL
+}

@@ -1,4 +1,5 @@
 import prisma from '../../config/prisma.js'
+import { JOB_STATUS } from '../../shared/constants/jobStatus.js'
 
 const daysAgo = (days) => {
     const date = new Date()
@@ -32,7 +33,7 @@ export async function cleanupOldData() {
 
     await prisma.submissionJob.deleteMany({
         where: {
-            status: 'COMPLETED',
+            status: JOB_STATUS.COMPLETED,
             finishedAt: {
                 lt: completedJobRetentionDate
             }
@@ -41,7 +42,7 @@ export async function cleanupOldData() {
 
     await prisma.submissionJob.deleteMany({
         where: {
-            status: 'FAILED',
+            status: JOB_STATUS.FAILED,
             finishedAt: {
                 lt: failedJobRetentionDate
             }

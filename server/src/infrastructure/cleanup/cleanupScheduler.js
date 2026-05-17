@@ -1,5 +1,5 @@
 import cron from 'node-cron'
-import { cleanupOldData, cleanupOldPayloads } from './cleanupOldData.job'
+import { cleanupOldData, cleanupOldPayloads } from './cleanupOldData.job.js'
 
 export function startCleanupScheduler() {
     cron.schedule('0 3 * * *', async () => {

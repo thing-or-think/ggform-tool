@@ -1,17 +1,33 @@
+/**
+ * Submission Job Service
+ *
+ * Responsibility:
+ * - Handles submission job creation and completion workflow.
+ * - Persists submission results and updates aggregate job execution status.
+ *
+ * Used by:
+ * - Submission controllers
+ * - Queue workers
+ * - Background job processors
+ *
+ * Notes:
+ * - Uses database transactions to keep job status and result records consistent.
+ * - Business workflow belongs here; low-level database access can be moved to repository layer when needed.
+ */
+
 import prisma from '../../config/prisma.js'
+import { JOB_STATUS } from '../../shared/constants/jobStatus.js'
 
 export const submissionJobService = {
     async createJob({ formId, totalRecords }) {
         return prisma.$transaction(async (tx) => {
-            const job = await tx.submissionJob.create({
+            return tx.submissionJob.create({
                 data: {
                     formId,
                     totalRecords,
-                    status: 'QUEUED'
+                    status: JOB_STATUS.QUEUED
                 }
             })
-
-            return job
         })
     }
 }
@@ -34,17 +50,17 @@ export async function completeSubmissionJob(jobId, results) {
         const successCount = results.filter((item) => item.success).length
         const failedCount = results.filter((item) => !item.success).length
 
-        let status = 'COMPLETED'
+        let status = JOB_STATUS.COMPLETED
 
         if (successCount > 0 && failedCount > 0) {
-            status = 'PARTIAL_FAILED'
+            status = JOB_STATUS.PARTIAL_FAILED
         }
 
         if (successCount === 0 && failedCount > 0) {
-            status = 'FAILED'
+            status = JOB_STATUS.FAILED
         }
 
-        const job = await tx.submissionJob.update({
+        return tx.submissionJob.update({
             where: { id: jobId },
             data: {
                 successCount,
@@ -53,7 +69,5 @@ export async function completeSubmissionJob(jobId, results) {
                 finishedAt: new Date()
             }
         })
-
-        return job
     })
 }

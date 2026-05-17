@@ -1,4 +1,22 @@
+/**
+ * Submission Job Repository
+ *
+ * Responsibility:
+ * - Encapsulates database access logic for submission job records.
+ * - Provides methods to create, query, update status, and update execution counters.
+ *
+ * Used by:
+ * - Submission services
+ * - Queue workers
+ * - Job processing workflows
+ *
+ * Notes:
+ * - This repository should only handle persistence logic.
+ * - Business rules and workflow orchestration should stay in service/worker layers.
+ */
+
 import prisma from '../../config/prisma.js'
+import { JOB_STATUS } from '../../shared/constants/jobStatus.js'
 
 export const submissionJobRepository = {
     create(data) {
@@ -21,8 +39,8 @@ export const submissionJobRepository = {
         return prisma.submissionJob.update({
             where: { id },
             data: {
-                status: 'PROCESSING',
-                startedAt: new DataTransfer()
+                status: JOB_STATUS.PROCESSING,
+                startedAt: new Date()
             }
         })
     },
@@ -31,7 +49,7 @@ export const submissionJobRepository = {
         return prisma.submissionJob.update({
             where: { id },
             data: {
-                status: 'COMPLETED',
+                status: JOB_STATUS.COMPLETED,
                 finishedAt: new Date()
             }
         })
@@ -41,8 +59,8 @@ export const submissionJobRepository = {
         return prisma.submissionJob.update({
             where: { id },
             data: {
-                status: 'FAILED',
-                finishedAt: new Data()
+                status: JOB_STATUS.FAILED,
+                finishedAt: new Date()
             }
         })
     },
