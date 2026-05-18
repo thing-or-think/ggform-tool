@@ -1,0 +1,75 @@
+ApiMeta:
+  type: object
+  required:
+    - requestId
+    - timestamp
+  properties:
+    requestId:
+      type: string
+      example: req_abc123
+    timestamp:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+
+ErrorDetail:
+  type: object
+  properties:
+    field:
+      type: string
+      nullable: true
+      example: formUrl
+    message:
+      type: string
+      example: Google Form is not accessible or has invalid structure
+    rowIndex:
+      type: integer
+      nullable: true
+      example: 2
+    service:
+      type: string
+      nullable: true
+      example: redis
+
+ApiError:
+  type: object
+  required:
+    - code
+    - details
+  properties:
+    code:
+      type: string
+      example: VALIDATION_ERROR
+    details:
+      type: array
+      items:
+        $ref: "#/ErrorDetail"
+
+Pagination:
+  type: object
+  required:
+    - page
+    - limit
+    - totalItems
+    - totalPages
+    - hasNextPage
+    - hasPreviousPage
+  properties:
+    page:
+      type: integer
+      example: 1
+    limit:
+      type: integer
+      example: 20
+    totalItems:
+      type: integer
+      example: 100
+    totalPages:
+      type: integer
+      example: 5
+    hasNextPage:
+      type: boolean
+      example: true
+    hasPreviousPage:
+      type: boolean
+      example: false
