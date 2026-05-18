@@ -1,0 +1,33 @@
+CreateSubmissionJobExample:
+  value:
+    formId: form_01HXYZABC
+    datasetId: dataset_01HXYZABC
+    options:
+      retryLimit: 3
+      delayBetweenRequestsMs: 500
+      skipInvalidRecords: true
+
+SubmissionJobAcceptedExample:
+  value:
+    success: true
+    message: Submission job accepted
+    data:
+      job:
+        id: job_01HXYZABC
+        formId: form_01HXYZABC
+        datasetId: dataset_01HXYZABC
+        status: QUEUED
+        totalRecords: 98
+        processedCount: 0
+        successCount: 0
+        failedCount: 0
+        retryCount: 0
+        progress: 0
+        options:
+          retryLimit: 3
+          delayBetweenRequestsMs: 500
+          skipInvalidRecords: true
+        createdAt: "2026-05-18T08:00:00.000Z"
+    meta:
+      requestId: req_abc123
+      timestamp: "2026-05-18T08:00:00.000Z"

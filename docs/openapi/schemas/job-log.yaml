@@ -1,0 +1,36 @@
+JobLog:
+  type: object
+  required:
+    - id
+    - jobId
+    - level
+    - message
+    - createdAt
+  properties:
+    id:
+      type: string
+      example: log_01HXYZ001
+    jobId:
+      type: string
+      example: job_01HXYZABC
+    level:
+      type: string
+      enum:
+        - debug
+        - info
+        - warn
+        - error
+      example: info
+    message:
+      type: string
+      example: Submission record processed successfully
+    context:
+      type: object
+      additionalProperties: true
+      example:
+        recordIndex: 1
+        attempt: 1
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:02:00.000Z"

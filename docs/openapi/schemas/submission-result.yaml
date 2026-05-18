@@ -1,0 +1,61 @@
+SubmissionResult:
+  type: object
+  required:
+    - id
+    - jobId
+    - recordIndex
+    - status
+    - attemptCount
+    - submittedPayload
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: string
+      example: result_01HXYZ001
+    jobId:
+      type: string
+      example: job_01HXYZABC
+    recordIndex:
+      type: integer
+      example: 1
+    status:
+      type: string
+      enum:
+        - SUCCESS
+        - FAILED
+        - RETRYING
+        - SKIPPED
+      example: SUCCESS
+    attemptCount:
+      type: integer
+      example: 1
+    submittedPayload:
+      type: object
+      additionalProperties:
+        type: string
+      example:
+        entry.123456789: Nguyen Van A
+        entry.987654321: Male
+    providerResponse:
+      type: object
+      nullable: true
+      additionalProperties: true
+      example:
+        statusCode: 200
+    errorCode:
+      type: string
+      nullable: true
+      example: null
+    errorMessage:
+      type: string
+      nullable: true
+      example: null
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:02:00.000Z"
+    updatedAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:02:00.000Z"

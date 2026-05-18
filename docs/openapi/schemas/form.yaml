@@ -1,0 +1,155 @@
+ScanFormRequest:
+  type: object
+  required:
+    - formUrl
+  properties:
+    formUrl:
+      type: string
+      format: uri
+      example: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+    forceRefresh:
+      type: boolean
+      default: false
+      example: false
+
+FormField:
+  type: object
+  required:
+    - id
+    - entryId
+    - label
+    - type
+    - required
+    - options
+  properties:
+    id:
+      type: string
+      example: field_01HXYZ001
+    entryId:
+      type: string
+      example: entry.123456789
+    label:
+      type: string
+      example: Full name
+    type:
+      type: string
+      enum:
+        - TEXT
+        - PARAGRAPH
+        - RADIO
+        - CHECKBOX
+        - DROPDOWN
+        - DATE
+        - TIME
+        - FILE_UPLOAD
+        - SCALE
+        - GRID
+      example: TEXT
+    required:
+      type: boolean
+      example: true
+    options:
+      type: array
+      items:
+        type: string
+      example: []
+    order:
+      type: integer
+      example: 1
+
+Form:
+  type: object
+  required:
+    - id
+    - title
+    - formUrl
+    - provider
+    - status
+    - fields
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: string
+      example: form_01HXYZABC
+    title:
+      type: string
+      example: Customer Feedback Form
+    description:
+      type: string
+      nullable: true
+      example: Collect customer feedback
+    formUrl:
+      type: string
+      format: uri
+      example: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+    provider:
+      type: string
+      enum:
+        - google_form
+      example: google_form
+    status:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - FAILED
+      example: ACTIVE
+    fields:
+      type: array
+      items:
+        $ref: "#/FormField"
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+    updatedAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+
+FormSummary:
+  type: object
+  required:
+    - id
+    - title
+    - formUrl
+    - provider
+    - status
+    - fieldCount
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: string
+      example: form_01HXYZABC
+    title:
+      type: string
+      example: Customer Feedback Form
+    formUrl:
+      type: string
+      format: uri
+      example: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+    provider:
+      type: string
+      enum:
+        - google_form
+      example: google_form
+    status:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - FAILED
+      example: ACTIVE
+    fieldCount:
+      type: integer
+      example: 8
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+    updatedAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"

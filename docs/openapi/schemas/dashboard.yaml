@@ -1,0 +1,75 @@
+DashboardSummary:
+  type: object
+  required:
+    - forms
+    - jobs
+    - submissions
+    - queue
+  properties:
+    forms:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 10
+        active:
+          type: integer
+          example: 8
+        failed:
+          type: integer
+          example: 2
+    jobs:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 30
+        queued:
+          type: integer
+          example: 3
+        running:
+          type: integer
+          example: 2
+        completed:
+          type: integer
+          example: 20
+        failed:
+          type: integer
+          example: 2
+        partialFailed:
+          type: integer
+          example: 3
+    submissions:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 5000
+        success:
+          type: integer
+          example: 4600
+        failed:
+          type: integer
+          example: 400
+        successRate:
+          type: number
+          format: float
+          example: 92
+    queue:
+      type: object
+      properties:
+        waiting:
+          type: integer
+          example: 3
+        active:
+          type: integer
+          example: 2
+        completed:
+          type: integer
+          example: 20
+        failed:
+          type: integer
+          example: 2
+        delayed:
+          type: integer
+          example: 0

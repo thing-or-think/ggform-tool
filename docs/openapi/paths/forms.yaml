@@ -1,0 +1,131 @@
+scanForm:
+  post:
+    tags:
+      - Forms
+    summary: Scan Google Form
+    description: Scan a public Google Form URL, parse field structure, and store form metadata.
+    operationId: scanGoogleForm
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/form.yaml#/ScanFormRequest"
+          example:
+            formUrl: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+            forceRefresh: false
+    responses:
+      "200":
+        description: Existing form returned
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Google Form scanned successfully
+                data:
+                  type: object
+                  properties:
+                    form:
+                      $ref: "../schemas/form.yaml#/Form"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "201":
+        description: New form scanned successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Google Form scanned successfully
+                data:
+                  type: object
+                  properties:
+                    form:
+                      $ref: "../schemas/form.yaml#/Form"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "409":
+        $ref: "../responses/common.yaml#/Conflict"
+      "422":
+        $ref: "../responses/common.yaml#/UnprocessableEntity"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"
+
+forms:
+  get:
+    tags:
+      - Forms
+    summary: List scanned forms
+    operationId: listForms
+    parameters:
+      - $ref: "../parameters/common.yaml#/PageParam"
+      - $ref: "../parameters/common.yaml#/LimitParam"
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        example: feedback
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - FAILED
+        example: ACTIVE
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - createdAt
+            - updatedAt
+            - title
+          default: createdAt
+        example: createdAt
+      - $ref: "../parameters/common.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Forms fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Forms fetched successfully
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/form.yaml#/FormSummary"
+                pagination:
+                  $ref: "../schemas/common.yaml#/Pagination"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

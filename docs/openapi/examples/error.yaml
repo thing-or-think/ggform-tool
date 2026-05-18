@@ -1,0 +1,39 @@
+ValidationErrorExample:
+  value:
+    success: false
+    message: Validation failed
+    error:
+      code: VALIDATION_ERROR
+      details:
+        - field: formUrl
+          message: formUrl must be a valid Google Form URL
+    meta:
+      requestId: req_abc123
+      timestamp: "2026-05-18T08:00:00.000Z"
+
+FormNotFoundExample:
+  value:
+    success: false
+    message: Form not found
+    error:
+      code: FORM_NOT_FOUND
+      details:
+        - field: formId
+          message: No form found with the provided id
+    meta:
+      requestId: req_abc123
+      timestamp: "2026-05-18T08:00:00.000Z"
+
+DatasetValidationFailedExample:
+  value:
+    success: false
+    message: Dataset validation failed
+    error:
+      code: DATASET_VALIDATION_FAILED
+      details:
+        - rowIndex: 2
+          field: entry.123456789
+          message: Required field is missing
+    meta:
+      requestId: req_abc123
+      timestamp: "2026-05-18T08:00:00.000Z"

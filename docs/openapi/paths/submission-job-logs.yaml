@@ -1,0 +1,57 @@
+submissionJobLogs:
+  get:
+    tags:
+      - Job Logs
+    summary: List logs of submission job
+    operationId: listSubmissionJobLogs
+    parameters:
+      - $ref: "../parameters/common.yaml#/JobIdParam"
+      - $ref: "../parameters/common.yaml#/PageParam"
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+        example: 50
+      - name: level
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - debug
+            - info
+            - warn
+            - error
+        example: error
+    responses:
+      "200":
+        description: Job logs fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Job logs fetched successfully
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/job-log.yaml#/JobLog"
+                pagination:
+                  $ref: "../schemas/common.yaml#/Pagination"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

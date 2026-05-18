@@ -1,0 +1,94 @@
+BadRequest:
+  description: Bad request
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - success
+          - message
+          - error
+          - meta
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Validation failed
+          error:
+            $ref: "../schemas/common.yaml#/ApiError"
+          meta:
+            $ref: "../schemas/common.yaml#/ApiMeta"
+
+NotFound:
+  description: Resource not found
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Resource not found
+          error:
+            $ref: "../schemas/common.yaml#/ApiError"
+          meta:
+            $ref: "../schemas/common.yaml#/ApiMeta"
+
+Conflict:
+  description: Conflict
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Resource conflict
+          error:
+            $ref: "../schemas/common.yaml#/ApiError"
+          meta:
+            $ref: "../schemas/common.yaml#/ApiMeta"
+
+UnprocessableEntity:
+  description: Unprocessable entity
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Business validation failed
+          error:
+            $ref: "../schemas/common.yaml#/ApiError"
+          meta:
+            $ref: "../schemas/common.yaml#/ApiMeta"
+
+InternalServerError:
+  description: Internal server error
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Internal server error
+          error:
+            $ref: "../schemas/common.yaml#/ApiError"
+          meta:
+            $ref: "../schemas/common.yaml#/ApiMeta"

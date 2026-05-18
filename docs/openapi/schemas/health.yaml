@@ -1,0 +1,19 @@
+HealthStatus:
+  type: object
+  required:
+    - status
+    - uptime
+    - timestamp
+  properties:
+    status:
+      type: string
+      enum:
+        - ok
+      example: ok
+    uptime:
+      type: number
+      example: 3600
+    timestamp:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"

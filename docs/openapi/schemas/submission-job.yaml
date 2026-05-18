@@ -1,0 +1,137 @@
+SubmissionJobOptions:
+  type: object
+  properties:
+    retryLimit:
+      type: integer
+      minimum: 0
+      maximum: 10
+      example: 3
+    delayBetweenRequestsMs:
+      type: integer
+      minimum: 0
+      example: 500
+    skipInvalidRecords:
+      type: boolean
+      example: true
+
+CreateSubmissionJobRequest:
+  type: object
+  required:
+    - formId
+    - datasetId
+  properties:
+    formId:
+      type: string
+      example: form_01HXYZABC
+    datasetId:
+      type: string
+      example: dataset_01HXYZABC
+    options:
+      $ref: "#/SubmissionJobOptions"
+
+CancelSubmissionJobRequest:
+  type: object
+  properties:
+    reason:
+      type: string
+      maxLength: 500
+      example: User requested cancellation
+
+RetryFailedRecordsRequest:
+  type: object
+  properties:
+    retryLimit:
+      type: integer
+      minimum: 1
+      maximum: 10
+      example: 3
+    onlyRetryableErrors:
+      type: boolean
+      example: true
+
+SubmissionJob:
+  type: object
+  required:
+    - id
+    - formId
+    - datasetId
+    - status
+    - totalRecords
+    - processedCount
+    - successCount
+    - failedCount
+    - retryCount
+    - createdAt
+  properties:
+    id:
+      type: string
+      example: job_01HXYZABC
+    parentJobId:
+      type: string
+      nullable: true
+      example: null
+    formId:
+      type: string
+      example: form_01HXYZABC
+    datasetId:
+      type: string
+      example: dataset_01HXYZABC
+    status:
+      type: string
+      enum:
+        - QUEUED
+        - RUNNING
+        - COMPLETED
+        - FAILED
+        - CANCELLED
+        - CANCEL_REQUESTED
+        - PARTIAL_FAILED
+      example: RUNNING
+    totalRecords:
+      type: integer
+      example: 98
+    processedCount:
+      type: integer
+      example: 50
+    successCount:
+      type: integer
+      example: 45
+    failedCount:
+      type: integer
+      example: 5
+    retryCount:
+      type: integer
+      example: 2
+    progress:
+      type: number
+      format: float
+      example: 51.02
+    options:
+      $ref: "#/SubmissionJobOptions"
+    cancelReason:
+      type: string
+      nullable: true
+      example: null
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+    startedAt:
+      type: string
+      format: date-time
+      nullable: true
+      example: "2026-05-18T08:01:00.000Z"
+    finishedAt:
+      type: string
+      format: date-time
+      nullable: true
+      example: null
+    updatedAt:
+      type: string
+      format: date-time
+      nullable: true
+      example: "2026-05-18T08:10:00.000Z"
+
+SubmissionJobSummary:
+  allOf:
+    - $ref: "#/SubmissionJob"

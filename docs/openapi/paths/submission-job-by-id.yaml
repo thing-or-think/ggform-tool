@@ -1,0 +1,35 @@
+submissionJobById:
+  get:
+    tags:
+      - Submission Jobs
+    summary: Get submission job detail
+    operationId: getSubmissionJobById
+    parameters:
+      - $ref: "../parameters/common.yaml#/JobIdParam"
+    responses:
+      "200":
+        description: Submission job fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Submission job fetched successfully
+                data:
+                  type: object
+                  properties:
+                    job:
+                      $ref: "../schemas/submission-job.yaml#/SubmissionJob"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

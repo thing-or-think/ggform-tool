@@ -1,0 +1,142 @@
+openapi: 3.0.3
+
+info:
+  title: Google Form Tool API
+  version: 1.0.0
+  description: >
+    RESTful API for scanning Google Forms, uploading datasets,
+    creating asynchronous submission jobs, tracking job results,
+    and monitoring dashboard statistics.
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+  - url: https://api.example.com/api/v1
+    description: Production server
+
+tags:
+  - name: Forms
+    description: Scan and manage Google Forms
+  - name: Datasets
+    description: Upload and validate datasets for forms
+  - name: Submission Jobs
+    description: Create and monitor asynchronous submission jobs
+  - name: Submission Results
+    description: View record-level submission results
+  - name: Job Logs
+    description: View processing logs for submission jobs
+  - name: Dashboard
+    description: Dashboard summary and monitoring APIs
+  - name: Health
+    description: Service health check
+
+paths:
+  /forms/scan:
+    $ref: "./paths/forms.yaml#/scanForm"
+
+  /forms:
+    $ref: "./paths/forms.yaml#/forms"
+
+  /forms/{formId}:
+    $ref: "./paths/form-by-id.yaml#/formById"
+
+  /forms/{formId}/datasets:
+    $ref: "./paths/form-datasets.yaml#/formDatasets"
+
+  /submission-jobs:
+    $ref: "./paths/submission-jobs.yaml#/submissionJobs"
+
+  /submission-jobs/{jobId}:
+    $ref: "./paths/submission-job-by-id.yaml#/submissionJobById"
+
+  /submission-jobs/{jobId}/cancel:
+    $ref: "./paths/submission-job-actions.yaml#/cancelSubmissionJob"
+
+  /submission-jobs/{jobId}/retry-failed:
+    $ref: "./paths/submission-job-actions.yaml#/retryFailedSubmissionJob"
+
+  /submission-jobs/{jobId}/results:
+    $ref: "./paths/submission-job-results.yaml#/submissionJobResults"
+
+  /submission-jobs/{jobId}/logs:
+    $ref: "./paths/submission-job-logs.yaml#/submissionJobLogs"
+
+  /dashboard/summary:
+    $ref: "./paths/dashboard.yaml#/dashboardSummary"
+
+  /health:
+    $ref: "./paths/health.yaml#/health"
+
+components:
+  schemas:
+    ApiMeta:
+      $ref: "./schemas/common.yaml#/ApiMeta"
+    ApiError:
+      $ref: "./schemas/common.yaml#/ApiError"
+    ErrorDetail:
+      $ref: "./schemas/common.yaml#/ErrorDetail"
+    Pagination:
+      $ref: "./schemas/common.yaml#/Pagination"
+
+    Form:
+      $ref: "./schemas/form.yaml#/Form"
+    FormSummary:
+      $ref: "./schemas/form.yaml#/FormSummary"
+    FormField:
+      $ref: "./schemas/form.yaml#/FormField"
+    ScanFormRequest:
+      $ref: "./schemas/form.yaml#/ScanFormRequest"
+
+    Dataset:
+      $ref: "./schemas/dataset.yaml#/Dataset"
+    DatasetSummary:
+      $ref: "./schemas/dataset.yaml#/DatasetSummary"
+    UploadJsonDatasetRequest:
+      $ref: "./schemas/dataset.yaml#/UploadJsonDatasetRequest"
+
+    SubmissionJob:
+      $ref: "./schemas/submission-job.yaml#/SubmissionJob"
+    SubmissionJobSummary:
+      $ref: "./schemas/submission-job.yaml#/SubmissionJobSummary"
+    CreateSubmissionJobRequest:
+      $ref: "./schemas/submission-job.yaml#/CreateSubmissionJobRequest"
+    CancelSubmissionJobRequest:
+      $ref: "./schemas/submission-job.yaml#/CancelSubmissionJobRequest"
+    RetryFailedRecordsRequest:
+      $ref: "./schemas/submission-job.yaml#/RetryFailedRecordsRequest"
+
+    SubmissionResult:
+      $ref: "./schemas/submission-result.yaml#/SubmissionResult"
+
+    JobLog:
+      $ref: "./schemas/job-log.yaml#/JobLog"
+
+    DashboardSummary:
+      $ref: "./schemas/dashboard.yaml#/DashboardSummary"
+
+    HealthStatus:
+      $ref: "./schemas/health.yaml#/HealthStatus"
+
+  responses:
+    BadRequest:
+      $ref: "./responses/common.yaml#/BadRequest"
+    NotFound:
+      $ref: "./responses/common.yaml#/NotFound"
+    Conflict:
+      $ref: "./responses/common.yaml#/Conflict"
+    UnprocessableEntity:
+      $ref: "./responses/common.yaml#/UnprocessableEntity"
+    InternalServerError:
+      $ref: "./responses/common.yaml#/InternalServerError"
+
+  parameters:
+    PageParam:
+      $ref: "./parameters/common.yaml#/PageParam"
+    LimitParam:
+      $ref: "./parameters/common.yaml#/LimitParam"
+    SortOrderParam:
+      $ref: "./parameters/common.yaml#/SortOrderParam"
+    FormIdParam:
+      $ref: "./parameters/common.yaml#/FormIdParam"
+    JobIdParam:
+      $ref: "./parameters/common.yaml#/JobIdParam"

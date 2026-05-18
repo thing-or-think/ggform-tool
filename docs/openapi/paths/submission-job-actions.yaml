@@ -1,0 +1,94 @@
+cancelSubmissionJob:
+  post:
+    tags:
+      - Submission Jobs
+    summary: Cancel submission job
+    operationId: cancelSubmissionJob
+    parameters:
+      - $ref: "../parameters/common.yaml#/JobIdParam"
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/submission-job.yaml#/CancelSubmissionJobRequest"
+          example:
+            reason: User requested cancellation
+    responses:
+      "200":
+        description: Submission job cancellation requested
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Submission job cancellation requested
+                data:
+                  type: object
+                  properties:
+                    job:
+                      $ref: "../schemas/submission-job.yaml#/SubmissionJob"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "409":
+        $ref: "../responses/common.yaml#/Conflict"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"
+
+retryFailedSubmissionJob:
+  post:
+    tags:
+      - Submission Jobs
+    summary: Retry failed records
+    operationId: retryFailedRecords
+    parameters:
+      - $ref: "../parameters/common.yaml#/JobIdParam"
+    requestBody:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/submission-job.yaml#/RetryFailedRecordsRequest"
+          example:
+            retryLimit: 3
+            onlyRetryableErrors: true
+    responses:
+      "202":
+        description: Retry job accepted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Retry job accepted
+                data:
+                  type: object
+                  properties:
+                    job:
+                      $ref: "../schemas/submission-job.yaml#/SubmissionJob"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "409":
+        $ref: "../responses/common.yaml#/Conflict"
+      "422":
+        $ref: "../responses/common.yaml#/UnprocessableEntity"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

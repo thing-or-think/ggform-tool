@@ -1,0 +1,28 @@
+ScanFormRequestExample:
+  value:
+    formUrl: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+    forceRefresh: false
+
+FormResponseExample:
+  value:
+    success: true
+    message: Google Form scanned successfully
+    data:
+      form:
+        id: form_01HXYZABC
+        title: Customer Feedback Form
+        description: Collect customer feedback
+        formUrl: https://docs.google.com/forms/d/e/1FAIpQLSdxxxx/viewform
+        provider: google_form
+        status: ACTIVE
+        fields:
+          - id: field_01HXYZ001
+            entryId: entry.123456789
+            label: Full name
+            type: TEXT
+            required: true
+            options: []
+            order: 1
+    meta:
+      requestId: req_abc123
+      timestamp: "2026-05-18T08:00:00.000Z"

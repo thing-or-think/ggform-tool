@@ -1,0 +1,35 @@
+formById:
+  get:
+    tags:
+      - Forms
+    summary: Get form detail
+    operationId: getFormById
+    parameters:
+      - $ref: "../parameters/common.yaml#/FormIdParam"
+    responses:
+      "200":
+        description: Form fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Form fetched successfully
+                data:
+                  type: object
+                  properties:
+                    form:
+                      $ref: "../schemas/form.yaml#/Form"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

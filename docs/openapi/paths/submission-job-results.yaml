@@ -1,0 +1,61 @@
+submissionJobResults:
+  get:
+    tags:
+      - Submission Results
+    summary: List submission results of job
+    operationId: listSubmissionResults
+    parameters:
+      - $ref: "../parameters/common.yaml#/JobIdParam"
+      - $ref: "../parameters/common.yaml#/PageParam"
+      - $ref: "../parameters/common.yaml#/LimitParam"
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILED
+            - RETRYING
+            - SKIPPED
+        example: FAILED
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - createdAt
+            - updatedAt
+            - recordIndex
+          default: createdAt
+        example: createdAt
+      - $ref: "../parameters/common.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Submission results fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Submission results fetched successfully
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/submission-result.yaml#/SubmissionResult"
+                pagination:
+                  $ref: "../schemas/common.yaml#/Pagination"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

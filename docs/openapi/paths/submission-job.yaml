@@ -1,0 +1,117 @@
+submissionJobs:
+  post:
+    tags:
+      - Submission Jobs
+    summary: Create submission job
+    description: Create an asynchronous submission job and enqueue it for worker processing.
+    operationId: createSubmissionJob
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/submission-job.yaml#/CreateSubmissionJobRequest"
+          example:
+            formId: form_01HXYZABC
+            datasetId: dataset_01HXYZABC
+            options:
+              retryLimit: 3
+              delayBetweenRequestsMs: 500
+              skipInvalidRecords: true
+    responses:
+      "202":
+        description: Submission job accepted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Submission job accepted
+                data:
+                  type: object
+                  properties:
+                    job:
+                      $ref: "../schemas/submission-job.yaml#/SubmissionJob"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "409":
+        $ref: "../responses/common.yaml#/Conflict"
+      "422":
+        $ref: "../responses/common.yaml#/UnprocessableEntity"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"
+
+  get:
+    tags:
+      - Submission Jobs
+    summary: List submission jobs
+    operationId: listSubmissionJobs
+    parameters:
+      - $ref: "../parameters/common.yaml#/PageParam"
+      - $ref: "../parameters/common.yaml#/LimitParam"
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - QUEUED
+            - RUNNING
+            - COMPLETED
+            - FAILED
+            - CANCELLED
+            - PARTIAL_FAILED
+        example: RUNNING
+      - name: formId
+        in: query
+        required: false
+        schema:
+          type: string
+        example: form_01HXYZABC
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - createdAt
+            - startedAt
+            - finishedAt
+          default: createdAt
+        example: createdAt
+      - $ref: "../parameters/common.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Submission jobs fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Submission jobs fetched successfully
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/submission-job.yaml#/SubmissionJobSummary"
+                pagination:
+                  $ref: "../schemas/common.yaml#/Pagination"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

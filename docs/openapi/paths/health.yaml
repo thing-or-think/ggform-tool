@@ -1,0 +1,26 @@
+health:
+  get:
+    tags:
+      - Health
+    summary: Health check
+    operationId: healthCheck
+    responses:
+      "200":
+        description: Service is healthy
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Service is healthy
+                data:
+                  $ref: "../schemas/health.yaml#/HealthStatus"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"

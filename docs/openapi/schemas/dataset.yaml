@@ -1,0 +1,130 @@
+DatasetValidationError:
+  type: object
+  properties:
+    rowIndex:
+      type: integer
+      example: 5
+    field:
+      type: string
+      example: entry.123456789
+    message:
+      type: string
+      example: Required field is missing
+
+Dataset:
+  type: object
+  required:
+    - id
+    - formId
+    - type
+    - totalRecords
+    - validRecords
+    - invalidRecords
+    - status
+    - createdAt
+  properties:
+    id:
+      type: string
+      example: dataset_01HXYZABC
+    formId:
+      type: string
+      example: form_01HXYZABC
+    type:
+      type: string
+      enum:
+        - csv
+        - json
+      example: csv
+    totalRecords:
+      type: integer
+      example: 100
+    validRecords:
+      type: integer
+      example: 98
+    invalidRecords:
+      type: integer
+      example: 2
+    status:
+      type: string
+      enum:
+        - UPLOADED
+        - VALIDATED
+        - INVALID
+        - PROCESSING
+      example: VALIDATED
+    validationErrors:
+      type: array
+      items:
+        $ref: "#/DatasetValidationError"
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+
+DatasetSummary:
+  type: object
+  required:
+    - id
+    - formId
+    - type
+    - totalRecords
+    - validRecords
+    - invalidRecords
+    - status
+    - createdAt
+  properties:
+    id:
+      type: string
+      example: dataset_01HXYZABC
+    formId:
+      type: string
+      example: form_01HXYZABC
+    type:
+      type: string
+      enum:
+        - csv
+        - json
+      example: csv
+    totalRecords:
+      type: integer
+      example: 100
+    validRecords:
+      type: integer
+      example: 98
+    invalidRecords:
+      type: integer
+      example: 2
+    status:
+      type: string
+      enum:
+        - UPLOADED
+        - VALIDATED
+        - INVALID
+        - PROCESSING
+      example: VALIDATED
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-05-18T08:00:00.000Z"
+
+UploadJsonDatasetRequest:
+  type: object
+  required:
+    - type
+    - records
+  properties:
+    type:
+      type: string
+      enum:
+        - json
+      example: json
+    records:
+      type: array
+      minItems: 1
+      items:
+        type: object
+        additionalProperties:
+          type: string
+      example:
+        - entry.123456789: Nguyen Van A
+          entry.987654321: Male

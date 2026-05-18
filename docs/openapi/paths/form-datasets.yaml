@@ -1,0 +1,118 @@
+formDatasets:
+  post:
+    tags:
+      - Datasets
+    summary: Upload dataset for form
+    operationId: uploadDataset
+    parameters:
+      - $ref: "../parameters/common.yaml#/FormIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/dataset.yaml#/UploadJsonDatasetRequest"
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - file
+              - type
+            properties:
+              file:
+                type: string
+                format: binary
+              type:
+                type: string
+                enum:
+                  - csv
+                example: csv
+    responses:
+      "201":
+        description: Dataset uploaded and validated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Dataset uploaded and validated successfully
+                data:
+                  type: object
+                  properties:
+                    dataset:
+                      $ref: "../schemas/dataset.yaml#/Dataset"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "422":
+        $ref: "../responses/common.yaml#/UnprocessableEntity"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"
+
+  get:
+    tags:
+      - Datasets
+    summary: List datasets of form
+    operationId: listDatasetsByForm
+    parameters:
+      - $ref: "../parameters/common.yaml#/FormIdParam"
+      - $ref: "../parameters/common.yaml#/PageParam"
+      - $ref: "../parameters/common.yaml#/LimitParam"
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - UPLOADED
+            - VALIDATED
+            - INVALID
+            - PROCESSING
+        example: VALIDATED
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - createdAt
+            - totalRecords
+          default: createdAt
+        example: createdAt
+      - $ref: "../parameters/common.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Datasets fetched successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Datasets fetched successfully
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/dataset.yaml#/DatasetSummary"
+                pagination:
+                  $ref: "../schemas/common.yaml#/Pagination"
+                meta:
+                  $ref: "../schemas/common.yaml#/ApiMeta"
+      "400":
+        $ref: "../responses/common.yaml#/BadRequest"
+      "404":
+        $ref: "../responses/common.yaml#/NotFound"
+      "500":
+        $ref: "../responses/common.yaml#/InternalServerError"
