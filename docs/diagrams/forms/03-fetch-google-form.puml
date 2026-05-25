@@ -1,0 +1,23 @@
+@startuml
+title Scan Form - Fetch Google Form HTML
+
+participant "FormScannerService" as Scanner
+participant "GoogleFormClient\ngoogle-form.client.js" as GoogleClient
+participant "Google Forms Endpoint" as Google
+participant "Logger\nlogger.js" as Log
+participant "FormController" as Controller
+
+Scanner -> GoogleClient: fetchFormHtml(formUrl)
+GoogleClient -> Google: GET formUrl
+
+alt Google timeout / unavailable
+    Google --> GoogleClient: timeout / error
+    GoogleClient --> Scanner: fetch error
+    Scanner -> Log: error("Google Form unavailable", error)
+    Scanner --> Controller: throw GoogleFormFetchError
+else Google Form fetched
+    Google --> GoogleClient: formHtml
+    GoogleClient --> Scanner: formHtml
+end
+
+@enduml

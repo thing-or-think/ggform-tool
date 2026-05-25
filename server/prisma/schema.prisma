@@ -8,82 +8,278 @@ datasource db {
 }
 
 enum FormProvider {
-  GOOGLE_FORM
+  GOOGLE_FORM @map("google_form")
+
+  @@map("form_provider")
+}
+
+enum FormStatus {
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
+  ERROR    @map("error")
+
+  @@map("form_status")
+}
+
+enum FormFieldType {
+  TEXT         @map("text")
+  TEXTAREA     @map("textarea")
+  NUMBER       @map("number")
+  DATE         @map("date")
+  TIME         @map("time")
+  RADIO        @map("radio")
+  CHECKBOX     @map("checkbox")
+  SELECT       @map("select")
+  LINEAR_SCALE @map("linear_scale")
+  FILE_UPLOAD  @map("file_upload")
+  UNKNOWN      @map("unknown")
+
+  @@map("form_field_type")
+}
+
+enum SubmissionBatchSourceType {
+  CSV    @map("csv")
+  JSON   @map("json")
+  MANUAL @map("manual")
+
+  @@map("submission_batch_source_type")
+}
+
+enum SubmissionBatchStatus {
+  DRAFT      @map("draft")
+  VALIDATING @map("validating")
+  VALID      @map("valid")
+  INVALID    @map("invalid")
+  READY      @map("ready")
+  ARCHIVED   @map("archived")
+
+  @@map("submission_batch_status")
 }
 
 enum SubmissionJobStatus {
-  QUEUED
-  PROCESSING
-  COMPLETED
-  PARTIAL_FAILED
-  FAILED
-  CANCELLED
+  PENDING   @map("pending")
+  QUEUED    @map("queued")
+  RUNNING   @map("running")
+  COMPLETED @map("completed")
+  PARTIAL   @map("partial")
+  FAILED    @map("failed")
+  CANCELED  @map("canceled")
+  RETRYING  @map("retrying")
+
+  @@map("submission_job_status")
+}
+
+enum SubmissionResultStatus {
+  PENDING @map("pending")
+  SUCCESS @map("success")
+  FAILED  @map("failed")
+  SKIPPED @map("skipped")
+
+  @@map("submission_result_status")
+}
+
+enum JobLogLevel {
+  DEBUG @map("debug")
+  INFO  @map("info")
+  WARN  @map("warn")
+  ERROR @map("error")
+
+  @@map("job_log_level")
 }
 
 model Form {
-  id        String       @id @default(uuid())
-  formUrl   String
-  title     String?
-  provider  FormProvider @default(GOOGLE_FORM)
-  fields    Json
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id             String       @id @default(uuid()) @db.Uuid
+  title          String       @db.Text
+  description    String?      @db.Text
+  formUrl        String       @unique @map("form_url") @db.Text
+  provider       FormProvider
+  providerFormId String       @map("provider_form_id")
+  status         FormStatus   @default(ACTIVE)
+  scanError      String?      @map("scan_error") @db.Text
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  deletedAt      DateTime?    @map("deleted_at")
 
-  jobs SubmissionJob[]
+  fields            FormField[]
+  submissionBatches SubmissionBatch[]
+  submissionJobs    SubmissionJob[]
 
-  @@unique([formUrl])
   @@index([provider])
+  @@index([providerFormId])
+  @@index([status])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("forms")
 }
 
-model SubmissionJob {
-  id     String              @id @default(uuid())
-  formId String
-  status SubmissionJobStatus @default(QUEUED)
-
-  queuedAt   DateTime  @default(now())
-  startedAt  DateTime?
-  finishedAt DateTime?
-
-  failedCount  Int @default(0)
-  successCount Int @default(0)
-  totalRecords Int @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model FormField {
+  id        String        @id @default(uuid()) @db.Uuid
+  formId    String        @map("form_id") @db.Uuid
+  entryId   String        @map("entry_id") @db.VarChar(100)
+  label     String        @db.Text
+  type      FormFieldType
+  required  Boolean       @default(false)
+  options   Json?
+  sortOrder Int           @map("order")
+  raw       Json?
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
   form    Form               @relation(fields: [formId], references: [id], onDelete: Cascade)
-  results SubmissionResult[]
+  answers SubmissionAnswer[]
+
+  @@unique([formId, entryId])
+  @@index([formId])
+  @@index([entryId])
+  @@index([type])
+  @@index([sortOrder])
+  @@index([createdAt])
+  @@map("form_fields")
+}
+
+model SubmissionBatch {
+  id               String                    @id @default(uuid()) @db.Uuid
+  formId           String                    @map("form_id") @db.Uuid
+  name             String
+  sourceType       SubmissionBatchSourceType @map("source_type")
+  totalRecords     Int                       @default(0) @map("total_records")
+  validRecords     Int                       @default(0) @map("valid_records")
+  invalidRecords   Int                       @default(0) @map("invalid_records")
+  status           SubmissionBatchStatus     @default(DRAFT)
+  validationErrors Json?                     @map("validation_errors")
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
+  deletedAt        DateTime?                 @map("deleted_at")
+
+  form    Form               @relation(fields: [formId], references: [id], onDelete: Cascade)
+  records SubmissionRecord[]
+  jobs    SubmissionJob[]
 
   @@index([formId])
+  @@index([sourceType])
   @@index([status])
-  @@index([queuedAt])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("submission_batches")
+}
+
+model SubmissionRecord {
+  id               String   @id @default(uuid()) @db.Uuid
+  batchId          String   @map("batch_id") @db.Uuid
+  rowIndex         Int      @map("row_index")
+  isValid          Boolean  @default(false) @map("is_valid")
+  validationErrors Json?    @map("validation_errors")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  batch   SubmissionBatch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  answers SubmissionAnswer[]
+  results SubmissionResult[]
+
+  @@unique([batchId, rowIndex])
+  @@index([batchId])
+  @@index([isValid])
+  @@index([createdAt])
+  @@map("submission_records")
+}
+
+model SubmissionAnswer {
+  id        String   @id @default(uuid()) @db.Uuid
+  recordId  String   @map("record_id") @db.Uuid
+  fieldId   String   @map("field_id") @db.Uuid
+  entryId   String   @map("entry_id") @db.VarChar(100)
+  value     String?  @db.Text
+  valueJson Json?    @map("value_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  record SubmissionRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  field  FormField        @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([recordId, fieldId])
+  @@index([recordId])
+  @@index([fieldId])
+  @@index([entryId])
+  @@index([createdAt])
+  @@map("submission_answers")
+}
+
+model SubmissionJob {
+  id             String              @id @default(uuid()) @db.Uuid
+  formId         String              @map("form_id") @db.Uuid
+  batchId        String              @map("batch_id") @db.Uuid
+  parentJobId    String?             @map("parent_job_id") @db.Uuid
+  status         SubmissionJobStatus @default(PENDING)
+  totalRecords   Int                 @default(0) @map("total_records")
+  processedCount Int                 @default(0) @map("processed_count")
+  successCount   Int                 @default(0) @map("success_count")
+  failedCount    Int                 @default(0) @map("failed_count")
+  retryCount     Int                 @default(0) @map("retry_count")
+  options        Json?
+  cancelReason   String?             @map("cancel_reason") @db.Text
+  errorCode      String?             @map("error_code")
+  errorMessage   String?             @map("error_message") @db.Text
+  createdAt      DateTime            @default(now()) @map("created_at")
+  startedAt      DateTime?           @map("started_at")
+  finishedAt     DateTime?           @map("finished_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  form      Form            @relation(fields: [formId], references: [id], onDelete: Cascade)
+  batch     SubmissionBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  parentJob SubmissionJob?  @relation("SubmissionJobParent", fields: [parentJobId], references: [id], onDelete: SetNull)
+  childJobs SubmissionJob[] @relation("SubmissionJobParent")
+
+  results SubmissionResult[]
+  logs    JobLog[]
+
+  @@index([formId])
+  @@index([batchId])
+  @@index([parentJobId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([startedAt])
   @@index([finishedAt])
-  @@index([status, queuedAt])
   @@map("submission_jobs")
 }
 
 model SubmissionResult {
-  id    String @id @default(uuid())
-  jobId String
+  id               String                 @id @default(uuid()) @db.Uuid
+  jobId            String                 @map("job_id") @db.Uuid
+  recordId         String                 @map("record_id") @db.Uuid
+  recordIndex      Int                    @map("record_index")
+  status           SubmissionResultStatus @default(PENDING)
+  attemptCount     Int                    @default(0) @map("attempt_count")
+  submittedPayload Json?                  @map("submitted_payload")
+  providerResponse Json?                  @map("provider_response")
+  errorCode        String?                @map("error_code")
+  errorMessage     String?                @map("error_message") @db.Text
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
 
-  success      Boolean
-  attemptCount Int      @default(1)
-  submittedAt  DateTime @default(now())
-  durationMs   Int?
+  job    SubmissionJob    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  record SubmissionRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
 
-  requestPayload  Json?
-  responsePayload Json?
-  errorMessage    String?
+  @@unique([jobId, recordId])
+  @@index([jobId])
+  @@index([recordId])
+  @@index([status])
+  @@index([recordIndex])
+  @@index([createdAt])
+  @@map("submission_results")
+}
 
-  createdAt DateTime @default(now())
+model JobLog {
+  id        String      @id @default(uuid()) @db.Uuid
+  jobId     String      @map("job_id") @db.Uuid
+  level     JobLogLevel
+  message   String      @db.Text
+  context   Json?
+  createdAt DateTime    @default(now()) @map("created_at")
 
   job SubmissionJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([jobId])
-  @@index([success])
-  @@index([submittedAt])
-  @@index([jobId, success])
-  @@map("submission_results")
+  @@index([level])
+  @@index([createdAt])
+  @@map("job_logs")
 }

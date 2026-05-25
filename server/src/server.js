@@ -3,7 +3,7 @@ import { startCleanupScheduler } from './infrastructure/cleanup/cleanupScheduler
 import { env } from './config/index.js'
 import { logger } from './logger/logger.js'
 
-app.listen(env.PORT, () => {
+app.listen(env.port, () => {
     logger.info(`Server running on port ${env.port}`)
     startCleanupScheduler()
 })

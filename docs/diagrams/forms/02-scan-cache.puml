@@ -1,0 +1,21 @@
+@startuml
+title Scan Form - Check Cache
+
+participant "FormController\nform.controller.js" as Controller
+participant "FormScannerService\nform-scanner.service.js" as Scanner
+database "Redis Client\nredis.client.js" as Redis
+
+Controller -> Scanner: scanForm({ formUrl, userId, forceRefresh })
+
+Scanner -> Scanner: buildCacheKey(formUrl)
+Scanner -> Redis: get(cacheKey)
+
+alt cache hit and not forceRefresh
+    Redis --> Scanner: cachedSchema
+    Scanner --> Controller: cached scan result
+else cache miss or forceRefresh
+    Redis --> Scanner: null / ignored cache
+    Scanner --> Scanner: continue fetch Google Form
+end
+
+@enduml

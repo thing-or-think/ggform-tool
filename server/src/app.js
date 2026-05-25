@@ -1,25 +1,14 @@
-import express from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
-import pinoHttp from 'pino-http'
+import express from "express";
+import routes from "./routes/index.js";
 
-import { env } from './config/index.js'
-import { logger } from './logger/logger.js'
-import healthRoute from './routes/health.route.js'
+const app = express();
 
-const app = express()
+app.use(express.json());
 
-app.use(
-    cors({
-        origin: env.CLIENT_URL,
-        credentials: true
-    })
-)
+app.use(routes);
 
-app.use(helmet())
-app.use(express.json())
-app.use(pinoHttp({ logger }))
+app.get("/health", (req, res) => {
+    res.json({ status: "ok" });
+});
 
-app.use('/api/health', healthRoute)
-
-export default app
+export default app;

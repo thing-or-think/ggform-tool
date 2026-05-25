@@ -1,0 +1,65 @@
+@startuml
+title Sync Schema - Existing Form
+
+participant "FormScannerService" as Scanner
+participant "FormService" as FormService
+participant "FormFieldService" as FieldService
+participant "FormRepository" as FormRepo
+participant "FormFieldRepository" as FieldRepo
+database "Prisma Client" as Prisma
+database "PostgreSQL" as DB
+
+Scanner -> FormService: findByUrl(formUrl)
+FormService -> FormRepo: findByUrl(formUrl)
+FormRepo -> Prisma: prisma.form.findUnique(...)
+Prisma -> DB: SELECT form by form_url
+DB --> Prisma: existingForm
+Prisma --> FormRepo: existingForm
+FormRepo --> FormService: existingForm
+FormService --> Scanner: existingForm
+
+Scanner -> FieldService: findByFormId(existingForm.id)
+FieldService -> FieldRepo: findByFormId(existingForm.id)
+FieldRepo -> Prisma: prisma.formField.findMany(...)
+Prisma -> DB: SELECT form_fields
+DB --> Prisma: existingFields
+Prisma --> FieldRepo: existingFields
+FieldRepo --> FieldService: existingFields
+FieldService --> Scanner: existingFields
+
+Scanner -> Scanner: diffByEntryId(existingFields, parsedFields)
+
+alt schema unchanged
+    Scanner -> FormService: updateLastScannedAt(existingForm.id)
+    FormService -> FormRepo: update(existingForm.id, { lastScannedAt })
+    FormRepo -> Prisma: prisma.form.update(...)
+    Prisma -> DB: UPDATE forms
+else schema changed
+    loop new fields
+        Scanner -> FieldService: create(scannedField)
+        FieldService -> FieldRepo: create(scannedField)
+        FieldRepo -> Prisma: prisma.formField.create(...)
+        Prisma -> DB: INSERT form_fields
+    end
+
+    loop changed fields
+        Scanner -> FieldService: update(fieldId, scannedField)
+        FieldService -> FieldRepo: update(fieldId, scannedField)
+        FieldRepo -> Prisma: prisma.formField.update(...)
+        Prisma -> DB: UPDATE form_fields
+    end
+
+    loop removed fields
+        Scanner -> FieldService: softDelete(fieldId)
+        FieldService -> FieldRepo: softDelete(fieldId)
+        FieldRepo -> Prisma: prisma.formField.update({ deletedAt })
+        Prisma -> DB: UPDATE form_fields SET deleted_at
+    end
+
+    Scanner -> FormService: updateFormInfoAndSchemaHash(formId, formInfo, schemaHash)
+    FormService -> FormRepo: update(formId, data)
+    FormRepo -> Prisma: prisma.form.update(...)
+    Prisma -> DB: UPDATE forms
+end
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+title Scan Form - Auth & Validate Request
+
+actor User
+participant "React Frontend" as FE
+participant "Express Router\nroutes/form.routes.js" as Router
+participant "Auth Middleware" as Auth
+participant "Validate Middleware" as Validate
+participant "Form Validator\nform.validator.js" as FormValidator
+participant "FormController\nform.controller.js" as Controller
+
+User -> FE: enterFormUrl(formUrl)
+FE -> Router: POST /api/forms/scan { formUrl, JWT }
+
+Router -> Auth: verifyJWT(token)
+
+alt invalid / expired token
+    Auth --> Router: unauthorized
+    Router --> FE: 401 Unauthorized
+    FE --> User: showAuthError()
+else authorized
+    Auth --> Router: userContext
+
+    Router -> Validate: validate request body
+    Validate -> FormValidator: validateScanForm({ formUrl, forceRefresh })
+
+    alt validation failed
+        FormValidator --> Validate: validationError
+        Validate --> Router: 400 Invalid Google Form URL
+        Router --> FE: 400 Bad Request
+        FE --> User: showValidationError()
+    else valid input
+        FormValidator --> Validate: validatedData
+        Validate --> Router: next()
+        Router -> Controller: scanForm(req, res)
+    end
+end
+
+@enduml

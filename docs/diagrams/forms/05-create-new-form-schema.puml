@@ -1,0 +1,39 @@
+@startuml
+title Sync Schema - Create New Form
+
+participant "FormScannerService" as Scanner
+participant "FormService\nform.service.js" as FormService
+participant "FormFieldService\nform-field.service.js" as FieldService
+participant "FormRepository\nform.repository.js" as FormRepo
+participant "FormFieldRepository\nform-field.repository.js" as FieldRepo
+database "Prisma Client" as Prisma
+database "PostgreSQL" as DB
+
+Scanner -> FormService: findByUrl(formUrl)
+FormService -> FormRepo: findByUrl(formUrl)
+FormRepo -> Prisma: prisma.form.findUnique(...)
+Prisma -> DB: SELECT form by form_url
+DB --> Prisma: null
+Prisma --> FormRepo: null
+FormRepo --> FormService: null
+FormService --> Scanner: null
+
+Scanner -> FormService: create(formData)
+FormService -> FormRepo: create(formData)
+FormRepo -> Prisma: prisma.form.create(...)
+Prisma -> DB: INSERT forms
+DB --> Prisma: created form
+Prisma --> FormRepo: created form
+FormRepo --> FormService: created form
+FormService --> Scanner: form
+
+Scanner -> FieldService: createMany(form.id, parsedFields)
+FieldService -> FieldRepo: createMany(fields)
+FieldRepo -> Prisma: prisma.formField.createMany(...)
+Prisma -> DB: INSERT form_fields
+DB --> Prisma: created count
+Prisma --> FieldRepo: created count
+FieldRepo --> FieldService: created count
+FieldService --> Scanner: created fields result
+
+@enduml

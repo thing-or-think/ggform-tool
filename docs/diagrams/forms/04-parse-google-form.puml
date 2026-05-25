@@ -1,0 +1,34 @@
+@startuml
+title Scan Form - Parse Google Form
+
+participant "FormScannerService" as Scanner
+participant "GoogleFormParser\ngoogle-form.parser.js" as GoogleParser
+participant "GoogleFormMapper\ngoogle-form.mapper.js" as GoogleMapper
+participant "Logger\nlogger.js" as Log
+participant "FormController" as Controller
+
+Scanner -> GoogleParser: extractRawData(formHtml)
+
+alt cannot extract raw data
+    GoogleParser --> Scanner: parse error
+    Scanner -> Log: error("Cannot extract Google Form raw data")
+    Scanner --> Controller: throw GoogleFormParseError
+else raw data extracted
+    GoogleParser --> Scanner: rawData
+
+    Scanner -> GoogleParser: parseFormInfo(rawData)
+    GoogleParser --> Scanner: formInfo
+
+    Scanner -> GoogleParser: parseFields(rawData)
+    GoogleParser --> Scanner: googleFields
+
+    Scanner -> GoogleMapper: toFormData(formInfo, formUrl, userId)
+    GoogleMapper --> Scanner: formData
+
+    Scanner -> GoogleMapper: toFormFields(googleFields)
+    GoogleMapper --> Scanner: parsedFields
+
+    Scanner -> Scanner: computeSchemaHash(parsedFields)
+end
+
+@enduml

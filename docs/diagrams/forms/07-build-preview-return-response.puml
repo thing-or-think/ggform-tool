@@ -1,0 +1,34 @@
+@startuml
+title Scan Form - Build Preview & Return Response
+
+participant "FormScannerService" as Scanner
+participant "FormFieldService" as FieldService
+participant "FormFieldRepository" as FieldRepo
+database "Prisma Client" as Prisma
+database "PostgreSQL" as DB
+database "Redis Client" as Redis
+participant "FormController" as Controller
+participant "Express Router" as Router
+participant "React Frontend" as FE
+actor User
+
+Scanner -> FieldService: findByFormId(formId)
+FieldService -> FieldRepo: findByFormId(formId)
+FieldRepo -> Prisma: prisma.formField.findMany(...)
+Prisma -> DB: SELECT latest active fields
+DB --> Prisma: latestFields
+Prisma --> FieldRepo: latestFields
+FieldRepo --> FieldService: latestFields
+FieldService --> Scanner: latestFields
+
+Scanner -> Scanner: buildPreviewPayload(form, latestFields)
+
+Scanner -> Redis: set(cacheKey, latestSchema, TTL)
+Redis --> Scanner: cacheSaved
+
+Scanner --> Controller: scanResult { formId, fields, preview }
+Controller --> Router: 200 OK scanResult
+Router --> FE: 200 OK { formId, fields, preview }
+FE --> User: renderFormPreview(fields)
+
+@enduml
