@@ -85,7 +85,7 @@ export const formController = {
 
             return res.status(200).json({
                 success: true,
-                message: "Form scanned successfully",
+                message: "Google Form scanned successfully",
                 data: result
             })
         } catch (error) {

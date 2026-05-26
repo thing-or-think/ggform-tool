@@ -267,7 +267,7 @@ describe("formController unit", () => {
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
                 success: true,
-                message: "Form scanned successfully",
+                message: "Google Form scanned successfully",
                 data: scanResult
             });
             expect(next).not.toHaveBeenCalled();

@@ -17,7 +17,10 @@ export const formRepository = {
 
     findById(id) {
         return prisma.form.findUnique({
-            where: { id }
+            where: {
+                id,
+                deletedAt: null
+            }
         })
     },
 
@@ -53,8 +56,7 @@ export const formRepository = {
     softDelete(id) {
         return prisma.form.update({
             where: {
-                id,
-                deletedAt: null
+                id
             },
             data: {
                 deletedAt: new Date()
@@ -72,11 +74,17 @@ export const formRepository = {
             where: {
                 formUrl: data.formUrl
             },
-            update: updateData,
+            update: {
+                ...updateData,
+                deletedAt: null,
+                deletedAt: null
+
+            },
             create: {
                 ...data,
-                status: data.status ?? FORM_DEFAULT_STATUS
+                status: data.status ?? FORM_DEFAULT_STATUS,
+                deletedAt: null
             }
-        })
+        });
     }
 }

@@ -26,7 +26,6 @@ export const FORM_FIELD_RESPONSE_FIELDS = [
     "required",
     "options",
     "sortOrder",
-    "raw",
     "createdAt",
     "updatedAt"
 ];

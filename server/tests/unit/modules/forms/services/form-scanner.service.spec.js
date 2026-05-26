@@ -87,15 +87,10 @@ describe("formScannerService.scan", () => {
                         8,
                         null
                     ]
-                ],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                overrides.title ?? "Test Form"
-            ]
+                ]
+            ],
+            null,
+            overrides.title ?? "Test Form"
         ];
     }
 
@@ -190,12 +185,12 @@ describe("formScannerService.scan", () => {
         expect(result).toEqual({
             form: {
                 id: "form-id",
-                title: "Test Form"
-            },
-            fields: expect.any(Array)
+                title: "Test Form",
+                fields: expect.any(Array)
+            }
         });
 
-        expect(result.fields).toHaveLength(2);
+        expect(result.form.fields).toHaveLength(2);
     });
 
     test("ignores page break items because they are not input fields", async () => {

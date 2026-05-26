@@ -2,6 +2,8 @@ import axios from "axios";
 
 import { formRepository } from "../repositories/form.repository.js";
 import { formFieldRepository } from "../repositories/form-field.repository.js";
+import { formFieldMapper } from "../mappers/form-field.mapper.js";
+import { formMapper } from "../mappers/form.mapper.js";
 
 import {
     FORM_PROVIDER,
@@ -62,7 +64,7 @@ function parseOptions(item) {
 }
 
 function parseGoogleForm(rawData) {
-    const title = rawData?.[1]?.[8] ?? "Untitled";
+    const title = rawData?.[3] ?? "Untitled";
     const description = rawData?.[1]?.[0] ?? "";
     const items = rawData?.[1]?.[1] ?? [];
 
@@ -169,9 +171,16 @@ export const formScannerService = {
                 parsedForm.fields
             );
 
+            const fields = parsedForm.fields.map(field =>
+                formFieldMapper.toResponse(field)
+            );
+
             return {
-                form,
-                fields: parsedForm.fields
+                form: {
+                    ...formMapper.toResponse(form),
+                    fields
+                }
+
             };
         } catch (error) {
             await formRepository.upsertByUrl({

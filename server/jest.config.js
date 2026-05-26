@@ -5,5 +5,11 @@ export default {
         "<rootDir>/tests/setup/integration.setup.js"
     ],
 
-    maxWorkers: 1
+    maxWorkers: 1,
+
+    transform: {},
+
+    clearMocks: true,
+
+    verbose: true
 };

@@ -54,24 +54,19 @@ describe("formScannerService integration", () => {
                             ]
                         ]
                     ]
-                ],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "Test Form"
-            ]
+                ]
+            ],
+            null,
+            "Test Form"
         ];
 
         return `
-            <html>
-                <script>
-                    var FB_PUBLIC_LOAD_DATA_ = ${JSON.stringify(rawData)};
-                </script>
-            </html>
-        `;
+        <html>
+            <script>
+                var FB_PUBLIC_LOAD_DATA_ = ${JSON.stringify(rawData)};
+            </script>
+        </html>
+    `;
     }
 
     it("scans Google Form and saves form with fields", async () => {
@@ -89,7 +84,7 @@ describe("formScannerService integration", () => {
         expect(result.form.status).toBe("ACTIVE");
         expect(result.form.scanError).toBeNull();
 
-        expect(result.fields).toHaveLength(2);
+        expect(result.form.fields).toHaveLength(2);
 
         const fields = await prisma.formField.findMany({
             where: {
@@ -174,5 +169,35 @@ describe("formScannerService integration", () => {
         expect(form).toBeDefined();
         expect(form.status).toBe("ERROR");
         expect(form.scanError).toBe("Cannot extract Google Form data");
+    });
+
+    it("saves raw field data in database but does not return raw in response", async () => {
+        axios.get.mockResolvedValue({
+            data: buildGoogleFormHtml()
+        });
+
+        const result = await formScannerService.scan(validUrl);
+
+        const fields = await prisma.formField.findMany({
+            where: {
+                formId: result.form.id
+            },
+            orderBy: {
+                sortOrder: "asc"
+            }
+        });
+
+        expect(fields).toHaveLength(2);
+
+        expect(fields[0].raw).toBeDefined();
+        expect(fields[0].raw).not.toBeNull();
+
+        expect(fields[1].raw).toBeDefined();
+        expect(fields[1].raw).not.toBeNull();
+
+        expect(result.form.fields).toHaveLength(2);
+
+        expect(result.form.fields[0]).not.toHaveProperty("raw");
+        expect(result.form.fields[1]).not.toHaveProperty("raw");
     });
 });

@@ -8,6 +8,22 @@ import {
 
 import { pickFields } from "../../../shared/utils/pick-fields.js";
 
+function normalizeOptions(options) {
+    if (!Array.isArray(options)) {
+        return [];
+    }
+
+    return options
+        .map(option => {
+            if (typeof option === "string") {
+                return options;
+            }
+
+            return option?.value;
+        })
+        .filter(option => option !== undefined && option !== null);
+}
+
 export const formFieldMapper = {
     toResponse(field) {
         if (!field) {
@@ -15,8 +31,11 @@ export const formFieldMapper = {
         }
 
         return pickFields(
-            field,
-            FORM_FIELD_RESPONSE_FIELDS
+            {
+                ...field,
+                options: normalizeOptions(field.options)
+            },
+            FORM_FIELD_RESPONSE_FIELDS,
         );
     },
 
